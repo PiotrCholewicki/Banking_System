@@ -32,7 +32,8 @@ def register_transaction(session: Session, client_id: int, amount: Decimal, tran
     session.add(transaction)
     session.add(client)
     session.commit()
-    session.refresh(client)
-    return client
+    session.refresh(transaction)
+    # session.refresh(client)
+    return transaction
 
 

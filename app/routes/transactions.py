@@ -5,6 +5,7 @@ from app.database import get_session
 from app.models.client import Client
 from app.models.transaction import Transaction
 from app.schemas.transaction import TransactionRead, TransactionCreate
+from app.services import banking_service
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
 
@@ -15,16 +16,18 @@ def create_transaction(payload: TransactionCreate, session: Session = Depends(ge
     if not client:
         raise HTTPException(status_code=404, detail="Client not found")
 
-    transaction = Transaction(
+    transaction = banking_service.register_transaction(
+        session,
         client_id=payload.client_id,
-        transaction_type=payload.transaction_type,
-        amount=payload.amount
+        amount=payload.amount,
+        transaction_type=payload.transaction_type
     )
-    session.add(transaction)
-    session.commit()
-    session.refresh(transaction)
     return transaction
+
 
 @router.get("/", response_model=list[TransactionRead])
 def list_transactions(session: Session = Depends(get_session)):
     return session.exec(select(Transaction)).all()
+
+
+

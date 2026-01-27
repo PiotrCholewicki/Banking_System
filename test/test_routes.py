@@ -63,17 +63,20 @@ def test_client_withdrawal_correct(session: Session, client: TestClient):
     session.add(client_1)
     session.commit()
     amount = 200
-    response = client.put(f"/clients/{client_1.id}/{amount}/withdrawal")
-    data = response.json()
-    assert data["balance"] == "100.00"
-    assert response.status_code == 200
+    client.post("/transactions/", json={"transaction_type": "withdrawal", "amount": amount, "client_id": client_1.id})
+
+    response2 = client.get(f"/clients/{client_1.id}")
+    data2 = response2.json()
+
+    assert data2["balance"] == "100.00"
+    assert response2.status_code == 200
 
 def test_client_withdrawal_incorrect(session: Session, client: TestClient):
     client_1 = Client(name="Adam", balance=Decimal("300.00"))
     session.add(client_1)
     session.commit()
     amount = 400
-    response = client.put(f"/clients/{client_1.id}/{amount}/withdrawal")
+    response = client.post("/transactions/", json={"transaction_type": "withdrawal", "amount": amount, "client_id": client_1.id})
     assert response.status_code == 400
 
 def test_client_deposit_correct(session: Session, client: TestClient):
@@ -81,17 +84,20 @@ def test_client_deposit_correct(session: Session, client: TestClient):
     session.add(client_1)
     session.commit()
     amount = 3700
-    response = client.put(f"/clients/{client_1.id}/{amount}/deposit")
-    data = response.json()
-    assert data["balance"] == "4000.00"
+    response = client.post("/transactions/", json={"transaction_type": "deposit", "amount": amount, "client_id": client_1.id})
     assert response.status_code == 200
+
+    response2 = client.get(f"/clients/{client_1.id}")
+    data2 = response2.json()
+    assert data2["balance"] == "4000.00"
+    assert response2.status_code == 200
 
 def test_client_deposit_incorrect(session: Session, client: TestClient):
     client_1 = Client(name="Adam", balance=Decimal("300.00"))
     session.add(client_1)
     session.commit()
     amount = -400
-    response = client.put(f"/clients/{client_1.id}/{amount}/deposit")
+    response = client.post("/transactions/", json={"transaction_type": "deposit", "amount": amount, "client_id": client_1.id})
     assert response.status_code == 400
 
 
@@ -99,7 +105,7 @@ def test_client_wrong_transaction_type(client: TestClient, session: Session):
     client_1 = Client(name="Adam", balance=Decimal("100.00"))
     session.add(client_1)
     session.commit()
-    response = client.put(f"/clients/{client_1.id}/50/unknown_type")
+    response = client.post("/transactions/", json={"transaction_type": "AAAA", "amount": -1000, "client_id": client_1.id})
     assert response.status_code == 400
 
 

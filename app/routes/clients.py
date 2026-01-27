@@ -51,10 +51,10 @@ def delete_client(client_id: int, session: Session = Depends(get_session)):
     session.commit()
     return Response(status_code=204)
 
-@router.put("/{client_id}/{amount}/{transaction_type}", response_model=ClientRead)
-def register_transaction(client_id: int, amount: Decimal, transaction_type: str, session: Session = Depends(get_session)):
-    if validate_client_id(client_id) and validate_amount(amount) and validate_transaction_type(transaction_type):
-        updated = banking_service.register_transaction(session, client_id, amount, transaction_type)
-        return updated
-    else: raise HTTPException(status_code=400, detail="Validation error")
+# @router.post("/{client_id}/{amount}/{transaction_type}", response_model=ClientRead)
+# def register_transaction(client_id: int, amount: Decimal, transaction_type: str, session: Session = Depends(get_session)):
+#     if validate_client_id(client_id) and validate_amount(amount) and validate_transaction_type(transaction_type):
+#         updated = banking_service.register_transaction(session, client_id, amount, transaction_type)
+#         return updated
+#     else: raise HTTPException(status_code=400, detail="Validation error")
 
