@@ -6,7 +6,7 @@ from app.database import engine
 
 from app.routes.clients import router as clients_router
 from app.routes.transactions import router as transactions_router
-
+from app.routes.transfers import router as transfers_router
 
 # app = FastAPI()
 # @app.on_event("startup")
@@ -23,6 +23,7 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(clients_router)
 app.include_router(transactions_router)
 
+app.include_router(transfers_router)
 def main():
 
     print("Starting")
