@@ -11,7 +11,7 @@ from app.models.transaction import Transaction
 def validate_amount(amount):
     if not isinstance(amount, Decimal):
         return False
-    if amount < 0:
+    if amount <= 0:
         return False
     return True
 
@@ -37,14 +37,6 @@ def validate_transaction_type(transaction_type):
     return True
 
 
-# def validate_date(date):
-#     if not isinstance(date, datetime):
-#         raise TypeError("Date must be a datetime object")
-#
-#     if date > datetime.now():
-#         raise ValueError("Date cannot be in the future")
-#
-#     return True
 
 def validate_client_id(client_id):
     if isinstance(client_id, bool):
