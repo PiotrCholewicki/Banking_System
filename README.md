@@ -99,27 +99,7 @@ Deletes a client and all related transactions.
 **Response:**
 - Status code **204 No Content**
 
----
-#### **Register a Transaction (Deposit/Withdrawal)**
-**PUT** `/clients/{client_id}/{amount}/{transaction_type}`
 
-Supported transaction types:
-- `deposit`
-- `withdrawal`
-
-**Example:**
-```
-PUT /clients/1/100/deposit
-```
-
-**Response:**
-```json
-{
-  "id": 1,
-  "name": "John Doe",
-  "balance": "300.00"
-}
-```
 
 ---
 ### Transactions Endpoints
