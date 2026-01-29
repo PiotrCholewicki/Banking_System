@@ -5,7 +5,10 @@ from fastapi.params import Depends
 from sqlalchemy import Column, Numeric
 from sqlmodel import Session, select, Field
 from fastapi import Response, APIRouter, HTTPException
+
+from app.auth.auth import get_current_user, require_admin
 from app.database import get_session
+from app.models.user import User
 from app.schemas.client import ClientCreate, ClientRead, ClientUpdate, ClientReadWithTransactions
 from app.models.client import Client
 from app.validators.value_validators import validate_client_name, validate_amount, validate_client_id, \
@@ -13,8 +16,10 @@ from app.validators.value_validators import validate_client_name, validate_amoun
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
-@router.post("/", response_model=ClientRead)
+# @router.post("/", response_model=ClientRead)
 def create_client(payload: ClientCreate, session: Session = Depends(get_session)):
+
+
     if validate_client_name(payload.name) and validate_amount(payload.balance):
         client = Client(
             name=payload.name,
@@ -28,17 +33,19 @@ def create_client(payload: ClientCreate, session: Session = Depends(get_session)
         raise HTTPException(status_code=404, detail="Validation Error")
 
 @router.get("/{client_id}", response_model=ClientReadWithTransactions)
-def get_client(client_id: int, session: Session = Depends(get_session)):
-    client = session.get(Client, client_id)
+def get_client(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+
+    client = session.get(Client, current_user.client_id)
     if not client:
         raise HTTPException(status_code=404, detail="Client not found")
     return client
 
 @router.get("/", response_model=list[ClientRead])
-def list_clients(session: Session = Depends(get_session)):
+def list_clients(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+    require_admin(current_user)
     return session.exec(select(Client)).all()
 
-@router.delete("/{client_id}", status_code=204)
+# @router.delete("/{client_id}", status_code=204)
 def delete_client(client_id: int, session: Session = Depends(get_session)):
     client = session.get(Client, client_id)
     if not client or not validate_client_id:

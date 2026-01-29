@@ -4,8 +4,6 @@ from decimal import Decimal
 from sqlalchemy import Numeric, Column
 from typing import Optional, TYPE_CHECKING
 
-
-
 class Transaction(SQLModel, table=True):
     __tablename__ = "transaction"
 

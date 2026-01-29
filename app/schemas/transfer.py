@@ -5,7 +5,7 @@ from sqlmodel import SQLModel
 
 
 class TransferCreate(SQLModel):
-    sender_id: int
+
     receiver_id: int
     amount: Decimal
 

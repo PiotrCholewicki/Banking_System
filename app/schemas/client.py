@@ -6,7 +6,6 @@ from sqlmodel import SQLModel
 class ClientCreate(SQLModel):
     name: str
     balance: Decimal
-
 class ClientUpdate(SQLModel):
     name: Optional[str] = None
     balance: Optional[Decimal] = None

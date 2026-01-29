@@ -10,10 +10,8 @@ def register_transfer(session: Session, sender_id: int, receiver_id: int, amount
     sender = session.get(Client, sender_id)
     receiver = session.get(Client, receiver_id)
 
-
     if sender_id == receiver_id:
         raise HTTPException(status_code=400, detail="Sender and receiver must be different")
-
 
     if not (sender and receiver):
         raise HTTPException(status_code=404, detail="Client not found")
@@ -25,7 +23,7 @@ def register_transfer(session: Session, sender_id: int, receiver_id: int, amount
         raise HTTPException(status_code=400, detail="Insufficient funds.")
     #sender transaction
     outgoing_transfer = Transaction(
-        client_id=sender_id,
+        client_id=sender.id,
         transaction_type="outgoing transfer",
         amount=amount
     )
@@ -51,12 +49,11 @@ def register_transfer(session: Session, sender_id: int, receiver_id: int, amount
     session.refresh(incoming_transfer)
     session.refresh(transfer)
     # session.refresh(client)
-
-
     return transfer
 
 def register_transaction(session: Session, client_id: int, amount: Decimal, transaction_type: str):
     client = session.get(Client, client_id)
+
     if not client:
         raise HTTPException(status_code=404, detail="Client not found")
 
