@@ -30,12 +30,7 @@ def create_transaction(payload: TransactionCreate, session: Session = Depends(ge
     return transaction
 
 
-@router.get("/", response_model=list[TransactionRead])
-def list_transactions(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
-    # admin = session.get(Client, admin.client_id) - only for admin
-    # ensure_client_access(client, current_user)
-    require_admin(current_user)
-    return session.exec(select(Transaction)).all()
+
 
 
 

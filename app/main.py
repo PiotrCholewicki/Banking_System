@@ -12,6 +12,7 @@ from app.routes.clients import router as clients_router
 from app.routes.transactions import router as transactions_router
 from app.routes.transfers import router as transfers_router
 from app.routes.auth import router as auth_router
+from app.routes.admin import router as admin_router
 # app = FastAPI()
 # @app.on_event("startup")
 # def on_startup():
@@ -48,11 +49,15 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(admin_router)
+app.include_router(auth_router)
 app.include_router(clients_router)
 app.include_router(transactions_router)
-app.include_router(auth_router)
 
 app.include_router(transfers_router)
+
+
+
 def main():
 
     print("Starting")

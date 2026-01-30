@@ -1,5 +1,5 @@
 from typing import Optional
-
+from decimal import Decimal
 from pydantic import BaseModel
 from sqlmodel import SQLModel
 
@@ -15,4 +15,5 @@ class TokenData(BaseModel):
 class UserRegister(SQLModel):
     username: str
     password: str
+    balance: Decimal
     # role: str  # "admin" | "client"

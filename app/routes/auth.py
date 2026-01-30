@@ -11,7 +11,7 @@ from app.auth.auth import (
     authenticate_user,
     create_access_token,
     get_current_user,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
+    ACCESS_TOKEN_EXPIRE_MINUTES, require_admin,
 )
 from app.routes.clients import delete_client
 from app.schemas.auth import UserRegister, Token
@@ -45,7 +45,7 @@ def register(payload: UserRegister, session: Session = Depends(get_session)):
     #Create client
     client = Client(
         name=user.username,
-        balance=0,
+        balance=payload.balance,
     )
     session.add(client)
     session.commit()
@@ -76,9 +76,14 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), session: Session = D
 def me(current_user: User = Depends(get_current_user)):
     return current_user
 
-@router.delete("/delete", status_code=204)
+@router.delete("/delete/", status_code=204)
 def delete_user(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+    if current_user.role == "admin":
+        raise HTTPException(status_code=400, detail="Can't delete admin")
     delete_client(current_user.client_id, session)
     session.delete(current_user)
     session.commit()
     return Response(status_code=204)
+
+
+
