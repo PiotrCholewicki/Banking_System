@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 from sqlite3 import IntegrityError
 
@@ -18,8 +19,10 @@ from app.routes.admin import router as admin_router
 # def on_startup():
 #     SQLModel.metadata.create_all(engine)
 
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "admin"
+
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+
 
 def seed_admin():
     with Session(engine) as session:
