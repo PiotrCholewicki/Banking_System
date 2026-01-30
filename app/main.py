@@ -2,6 +2,7 @@ import os
 from contextlib import asynccontextmanager
 from sqlite3 import IntegrityError
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from sqlmodel import SQLModel, Session, select
 
@@ -19,6 +20,8 @@ from app.routes.admin import router as admin_router
 # def on_startup():
 #     SQLModel.metadata.create_all(engine)
 
+
+load_dotenv()
 
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")

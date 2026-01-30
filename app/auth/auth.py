@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated, Optional
 
 import jwt
+from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
@@ -15,14 +16,13 @@ from app.models.user import User
 
 # to get a string like this run:
 # openssl rand -hex 32
+load_dotenv()
 
-
-JWT_SECRET = os.getenv("JWT_SECRET")
+SECRET_KEY = os.getenv("JWT_SECRET")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 password_hash = PasswordHash.recommended()
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
@@ -106,11 +106,9 @@ def require_admin(current_user: User):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin only")
 
 def ensure_client_access(client: Client, current_user: User):
-    # jeśli user ma rolę admin → full access
+    # admin or logged user is ok
     if current_user.role == "admin":
         return
-
-    # jeśli user ma rolę client → tylko własny klient
     if current_user.role == "client" and current_user.client_id == client.id:
         return
 
