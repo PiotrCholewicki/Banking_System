@@ -21,18 +21,15 @@ router = APIRouter(prefix="/clients", tags=["clients"])
 
 
 def create_client(payload: ClientCreate, session: Session = Depends(get_session)):
+    client = Client(
+        name=payload.name,
+        balance=payload.balance,
+    )
+    session.add(client)
+    session.commit()
+    session.refresh(client)
+    return client
 
-    if validate_client_name(payload.name) and validate_amount(payload.balance):
-        client = Client(
-            name=payload.name,
-            balance=payload.balance,
-        )
-        session.add(client)
-        session.commit()
-        session.refresh(client)
-        return client
-    else:
-        raise HTTPException(status_code=404, detail="Validation Error")
 
 @router.get("/me/", response_model=ClientRead)
 def get_my_info(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):

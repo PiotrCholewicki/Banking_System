@@ -23,11 +23,11 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
 def register(payload: UserRegister, session: Session = Depends(get_session)):
 
-    # prosta walidacja
+    # simple validation
     if not payload.username or not payload.password or len(payload.password) < 4:
         raise HTTPException(status_code=400, detail="Invalid credentials (min 4 chars)")
 
-    # unikalność nazwy
+    # unique username
     existing = session.exec(select(User).where(User.username == payload.username)).first()
     if existing:
         raise HTTPException(status_code=409, detail="Username already exists")

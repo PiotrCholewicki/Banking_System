@@ -18,6 +18,9 @@ def create_transfer(payload: TransferCreate, session: Session = Depends(get_sess
     if not (sender and receiver):
         raise HTTPException(status_code=404, detail="Client not found")
 
+    if payload.amount == 0:
+        raise HTTPException(status_code=400, detail="Cannot transfer 0")
+
     transfer = banking_service.register_transfer(
         session,
         receiver_id=payload.receiver_id,

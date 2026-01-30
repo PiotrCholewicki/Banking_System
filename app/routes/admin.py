@@ -39,11 +39,7 @@ def list_transactions(session: Session = Depends(get_session), current_user: Use
     return session.exec(select(Transaction)).all()
 
 @router.get("/clients/{client_id}", response_model=ClientReadWithTransactions)
-def get_client_with_provided_id(
-    client_id: int,
-    session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user)
-):
+def get_client_by_id(client_id: int, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
 
     client = session.get(Client, client_id)
     require_admin(current_user)

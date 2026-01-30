@@ -1,156 +1,175 @@
 
 # Banking System API
 
-This project implements a simple banking system built with **FastAPI**, **SQLModel**, and **SQLite**.
-It provides endpoints for managing clients, balances, and financial transactions.
-The API includes validation, error handling, and full CRUD operations.
+This project implements a secure banking system built with **FastAPI**, **SQLModel**, and **SQLite**.  
+It features user accounts, client accounts, JWT authentication, transactions, and money transfers.  
+Automated tests cover **~96%** of code.
 
 ---
+
 ## Running the Server
+
 To start the FastAPI development server, run:
 
 ```sh
 uvicorn app.main:app --reload
 ```
 
-The service will start at:
-- http://127.0.0.1:8000
+API documentation (Swagger UI):
 
-Interactive API documentation (Swagger UI) is available at:
 - http://127.0.0.1:8000/docs
 
 ---
+
 ## Project Structure
+
 ```
 app/
- ├── models/          # SQLModel database models
- ├── routes/          # FastAPI routers
+ ├── auth/            # JWT auth, hashing, permissions
+ ├── models/          # SQLModel ORM models
+ ├── routes/          # API endpoints
  ├── schemas/         # Request/response schemas
  ├── services/        # Business logic
- ├── validators/      # Input validation functions
- ├── database.py      # Database configuration
- └── main.py          # FastAPI application initialization
+ ├── validators/      # Optional input validators
+ ├── database.py      # DB engine and Session
+ └── main.py          # FastAPI app initialization
 ```
 
 ---
-## API Endpoints Documentation
 
-### Clients Endpoints
+## Authentication Endpoints
 
-#### **Create a Client**
-**POST** `/clients/`
+### Register User  
+**POST** `/auth/register`
 
-Creates a new client with an initial balance.
+Creates a new user and automatically creates a linked client account.
 
-**Request body:**
+Example:
+
 ```json
 {
-  "name": "John Doe",
-  "balance": 200.00
-}
-```
-
-**Response:**
-```json
-{
-  "id": 1,
-  "name": "John Doe",
-  "balance": "200.00"
+  "username": "john",
+  "password": "abcd1234",
+  "balance": 200
 }
 ```
 
 ---
-#### **Get Client by ID**
-**GET** `/clients/{client_id}`
 
-Returns client details including transactions.
+### Login  
+**POST** `/auth/login`
 
-**Response example:**
-```json
-{
-  "id": 1,
-  "name": "John Doe",
-  "balance": "200.00",
-  "transactions": []
-}
+Form-data:
+
+```
+username=<name>
+password=<password>
 ```
 
----
-#### **List All Clients**
-**GET** `/clients/`
-
-**Response:**
-```json
-[
-  {
-    "id": 1,
-    "name": "John Doe",
-    "balance": "200.00"
-  }
-]
-```
+Response contains JWT token.
 
 ---
-#### **Delete Client**
-**DELETE** `/clients/{client_id}`
 
-Deletes a client and all related transactions.
+### Current User  
+**GET** `/auth/me`
 
-**Response:**
-- Status code **204 No Content**
-
-
+Returns the authenticated user.
 
 ---
-### Transactions Endpoints
 
-#### **Create Transaction**
+### Delete My Account  
+**DELETE** `/auth/delete`
+
+Deletes the user, linked client, and all transactions.
+
+---
+
+## Client Endpoints
+
+### Get My Client  
+**GET** `/clients/me/`
+
+Returns client data for the authenticated user.
+
+---
+
+### Get My Transactions  
+**GET** `/clients/me/transactions`
+
+Returns all transactions of the authenticated client.
+
+---
+
+## Transaction Endpoints
+
+### Create Transaction  
 **POST** `/transactions/`
 
-**Request body:**
-```json
-{
-  "client_id": 1,
-  "transaction_type": "deposit",
-  "amount": 300.00
-}
-```
+Example:
 
-**Response:**
 ```json
 {
-  "id": 1,
-  "client_id": 1,
   "transaction_type": "deposit",
-  "amount": "300.00"
+  "amount": 300
 }
 ```
 
 ---
-#### **List All Transactions**
-**GET** `/transactions/`
 
-**Response:**
+## Transfer Endpoints
+
+### Create Transfer  
+**POST** `/transfers/`
+
+Transfers money from the logged-in user to another client.
+
+Example:
+
 ```json
-[
-  {
-    "id": 1,
-    "client_id": 1,
-    "transaction_type": "deposit",
-    "amount": "300.00"
-  }
-]
+{
+  "receiver_id": 4,
+  "amount": 50
+}
 ```
 
 ---
-## Input Validation Rules
-Validation is handled in `app/validators/` and includes:
 
-- Client name must start with a capital letter and contain only letters.
-- Balance and amount must be numeric, positive values.
-- Transaction type must be either *deposit* or *withdrawal*.
-- Client ID must be a positive integer.
-- Dates must be valid and not from the future.
+## Admin Endpoints
 
+(Require user role = admin)
 
-****
+```
+GET    /admin/users/
+GET    /admin/clients/
+GET    /admin/transactions/
+GET    /admin/clients/{client_id}
+DELETE /admin/users/{username}
+```
+
+---
+
+## Input Rules
+
+- amounts must be positive  
+- transfer amount cannot be 0  
+- withdrawal/transfer requires sufficient balance  
+- user cannot transfer to themselves  
+- all protected routes require JWT token  
+- admin routes require admin role  
+
+---
+
+## Tests
+
+The project contains an extensive Pytest suite covering:
+
+- authentication  
+- client operations  
+- transactions  
+- transfers  
+- admin routes  
+- permissions and JWT flow  
+
+**Approx. 96% of code is covered by automated tests.**
+
+---
