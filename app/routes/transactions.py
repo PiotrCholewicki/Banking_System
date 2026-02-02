@@ -1,10 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session, select
+from sqlmodel import Session
 
-from app.auth.auth import get_current_user, ensure_client_access, require_admin
+from app.auth.auth import get_current_user, ensure_client_access
 from app.database import get_session
 from app.models.client import Client
-from app.models.transaction import Transaction
 from app.models.user import User
 from app.schemas.transaction import TransactionRead, TransactionCreate
 from app.services import banking_service

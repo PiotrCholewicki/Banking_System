@@ -1,8 +1,6 @@
 import math
-from datetime import timedelta, datetime
 from decimal import Decimal
 
-from app.models.transaction import Transaction
 from app.validators.value_validators import (
     validate_amount,
     validate_client_name,
@@ -11,6 +9,7 @@ from app.validators.value_validators import (
     validate_client_balance,
     validate_transactions,
 )
+
 
 # --------------------- AMOUNT ---------------------
 

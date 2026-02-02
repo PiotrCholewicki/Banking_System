@@ -1,8 +1,9 @@
-from sqlmodel import SQLModel, Field, Relationship, Session, create_engine, select
-from datetime import datetime, timezone
+from datetime import datetime
 from decimal import Decimal
+from typing import Optional
+
 from sqlalchemy import Numeric, Column
-from typing import Optional, TYPE_CHECKING
+from sqlmodel import SQLModel, Field, Relationship
 
 
 class Transaction(SQLModel, table=True):

@@ -47,7 +47,7 @@ def seed_admin():
         try:
             session.commit()
         except IntegrityError:
-            session.rollback()  # w razie równoczesnego startu wielu instancji
+            session.rollback()
 
 
 @asynccontextmanager

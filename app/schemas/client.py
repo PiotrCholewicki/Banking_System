@@ -2,7 +2,6 @@ from decimal import Decimal
 from typing import Optional, List
 from sqlmodel import SQLModel
 
-
 class ClientCreate(SQLModel):
     name: str
     balance: Decimal

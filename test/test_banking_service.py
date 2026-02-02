@@ -1,9 +1,5 @@
-import pytest
-from decimal import Decimal
-from fastapi import HTTPException
 from sqlmodel import Session, select
-from app.models.client import Client
-from app.models.transaction import Transaction
+
 from app.services.banking_service import register_transaction
 
 
@@ -104,7 +100,6 @@ from fastapi import HTTPException
 from app.services.banking_service import register_transfer
 from app.models.client import Client
 from app.models.transaction import Transaction
-from app.models.transfer import Transfer
 
 
 def test_register_transfer_success(session):

@@ -1,31 +1,19 @@
-from decimal import Decimal
-from http.client import responses
-from typing import List
-
-from fastapi_pagination import Page, paginate
-
-import app.services.banking_service as banking_service
-from fastapi.params import Depends
-from sqlalchemy import Column, Numeric
-from sqlmodel import Session, select, Field
 from fastapi import Response, APIRouter, HTTPException
+from fastapi.params import Depends
+from fastapi_pagination import Page, paginate
+from sqlmodel import Session
 
-from app.auth.auth import get_current_user, require_admin, ensure_client_access
+from app.auth.auth import get_current_user
 from app.database import get_session
+from app.models.client import Client
 from app.models.user import User
 from app.schemas.client import (
     ClientCreate,
     ClientRead,
-    ClientUpdate,
-    ClientReadWithTransactions,
 )
-from app.models.client import Client
-from app.schemas.transaction import TransactionRead, TransactionReadNoId
+from app.schemas.transaction import TransactionReadNoId
 from app.validators.value_validators import (
-    validate_client_name,
-    validate_amount,
     validate_client_id,
-    validate_transaction_type,
 )
 
 router = APIRouter(prefix="/clients", tags=["clients"])

@@ -1,19 +1,19 @@
 from datetime import timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 
-from app.database import get_session
-from app.models.user import User
-from app.models.client import Client
 from app.auth.auth import (
     get_password_hash,
     authenticate_user,
     create_access_token,
     get_current_user,
     ACCESS_TOKEN_EXPIRE_MINUTES,
-    require_admin,
 )
+from app.database import get_session
+from app.models.client import Client
+from app.models.user import User
 from app.routes.clients import delete_client
 from app.schemas.auth import UserRegister, Token
 
