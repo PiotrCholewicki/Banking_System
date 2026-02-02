@@ -11,13 +11,13 @@ from app.auth.auth import (
     authenticate_user,
     create_access_token,
     get_current_user,
-    ACCESS_TOKEN_EXPIRE_MINUTES, require_admin,
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    require_admin,
 )
 from app.routes.clients import delete_client
 from app.schemas.auth import UserRegister, Token
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-
 
 
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
@@ -28,7 +28,9 @@ def register(payload: UserRegister, session: Session = Depends(get_session)):
         raise HTTPException(status_code=400, detail="Invalid credentials (min 4 chars)")
 
     # unique username
-    existing = session.exec(select(User).where(User.username == payload.username)).first()
+    existing = session.exec(
+        select(User).where(User.username == payload.username)
+    ).first()
     if existing:
         raise HTTPException(status_code=409, detail="Username already exists")
 
@@ -42,7 +44,7 @@ def register(payload: UserRegister, session: Session = Depends(get_session)):
     session.add(user)
     session.commit()
     session.refresh(user)
-    #Create client
+    # Create client
     client = Client(
         name=user.username,
         balance=payload.balance,
@@ -56,19 +58,32 @@ def register(payload: UserRegister, session: Session = Depends(get_session)):
     session.commit()
     session.refresh(user)
 
-    #return token for swagger
-    token = create_access_token(data={"sub": user.username}, role=user.role, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    # return token for swagger
+    token = create_access_token(
+        data={"sub": user.username},
+        role=user.role,
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
     return Token(access_token=token)
 
 
 @router.post("/login", response_model=Token)
-def login(form_data: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_session)):
+def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    session: Session = Depends(get_session),
+):
 
     user = authenticate_user(session, form_data.username, form_data.password)
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+        )
 
-    token = create_access_token(data={"sub": user.username}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    token = create_access_token(
+        data={"sub": user.username},
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
     return Token(access_token=token)
 
 
@@ -76,14 +91,15 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), session: Session = D
 def me(current_user: User = Depends(get_current_user)):
     return current_user
 
+
 @router.delete("/delete/", status_code=204)
-def delete_user(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+def delete_user(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
     if current_user.role == "admin":
         raise HTTPException(status_code=400, detail="Can't delete admin")
     delete_client(current_user.client_id, session)
     session.delete(current_user)
     session.commit()
     return Response(status_code=204)
-
-
-

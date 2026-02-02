@@ -38,7 +38,6 @@ def get_user_by_username(session: Session, username):
     return session.exec(select(User).where(User.username == username)).first()
 
 
-
 def authenticate_user(session: Session, username: str, password: str) -> User | None:
     user = get_user_by_username(session, username)
     if not user:
@@ -46,7 +45,6 @@ def authenticate_user(session: Session, username: str, password: str) -> User | 
     if not verify_password(password, user.hashed_password):
         return None
     return user
-
 
 
 def create_access_token(data: dict, expires_delta: timedelta, role: str | None = None):
@@ -58,7 +56,6 @@ def create_access_token(data: dict, expires_delta: timedelta, role: str | None =
     to_encode.update({"exp": expire, "role": role})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
-
 
 
 async def get_current_user(
@@ -92,7 +89,6 @@ async def get_current_user(
     return user
 
 
-
 async def get_current_active_user(
     current_user: Annotated[User, Depends(get_current_user)],
 ):
@@ -105,6 +101,7 @@ def require_admin(current_user: User):
     if current_user.role != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin only")
 
+
 def ensure_client_access(client: Client, current_user: User):
     # admin or logged user is ok
     if current_user.role == "admin":
@@ -113,4 +110,3 @@ def ensure_client_access(client: Client, current_user: User):
         return
 
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
-

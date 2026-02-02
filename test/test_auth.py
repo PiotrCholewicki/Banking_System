@@ -1,7 +1,13 @@
 import pytest
 
-from app.auth.auth import get_password_hash, verify_password, authenticate_user, get_current_user, require_admin, \
-    ensure_client_access
+from app.auth.auth import (
+    get_password_hash,
+    verify_password,
+    authenticate_user,
+    get_current_user,
+    require_admin,
+    ensure_client_access,
+)
 from app.models.client import Client
 from test.conftest import make_token
 
@@ -17,6 +23,7 @@ def test_register_user_correct(client, session):
     data = response.json()
     assert "access_token" in data
 
+
 def test_register_user_incorrect_user_already_exists(client, session):
     payload = {"username": "Piotr", "password": "test1234", "balance": 150}
     client.post("/auth/register", json=payload)
@@ -25,28 +32,34 @@ def test_register_user_incorrect_user_already_exists(client, session):
     response = client.post("/auth/register", json=payload)
     assert response.status_code == 409
 
+
 def test_register_password_too_short(client, session):
     payload = {"username": "Piotr", "password": "aa", "balance": 150}
     response = client.post("/auth/register", json=payload)
     assert response.status_code == 400
 
+
 def test_login_correct(client, create_user):
     user = create_user(username="test", password="1234")
-    response = client.post("/auth/login/",
+    response = client.post(
+        "/auth/login/",
         data={"username": "test", "password": "1234"},
-        headers={"Content-Type": "application/x-www-form-urlencoded"}
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     assert response.status_code == 200
     data = response.json()
     assert "access_token" in data
 
+
 def test_login_correct_incorrect_password(client, create_user):
     user = create_user(username="test", password="1234")
-    response = client.post("/auth/login/",
+    response = client.post(
+        "/auth/login/",
         data={"username": "test", "password": "1234555"},
-        headers={"Content-Type": "application/x-www-form-urlencoded"}
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     assert response.status_code == 401
+
 
 def test_delete_me(auth_client, create_user):
     user = create_user(username="test", password="1234")
@@ -76,7 +89,6 @@ def test_authenticate_user_invalid(create_user, session):
 
     assert authenticate_user(session, "baduser", "abcd") is None
     assert authenticate_user(session, "piotr", "wrong") is None
-
 
 
 @pytest.mark.asyncio

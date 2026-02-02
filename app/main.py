@@ -15,6 +15,7 @@ from app.routes.transactions import router as transactions_router
 from app.routes.transfers import router as transfers_router
 from app.routes.auth import router as auth_router
 from app.routes.admin import router as admin_router
+
 # app = FastAPI()
 # @app.on_event("startup")
 # def on_startup():
@@ -29,7 +30,9 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
 def seed_admin():
     with Session(engine) as session:
-        existing = session.exec(select(User).where(User.username == ADMIN_USERNAME)).first()
+        existing = session.exec(
+            select(User).where(User.username == ADMIN_USERNAME)
+        ).first()
         if existing:
             return  # admin already exists
 
@@ -38,7 +41,7 @@ def seed_admin():
             hashed_password=get_password_hash(ADMIN_PASSWORD),
             role="admin",
             is_active=True,
-            client_id=None
+            client_id=None,
         )
         session.add(admin)
         try:
@@ -54,6 +57,7 @@ async def lifespan(app: FastAPI):
     seed_admin()
     yield
 
+
 app = FastAPI(lifespan=lifespan)
 app.include_router(admin_router)
 app.include_router(auth_router)
@@ -64,12 +68,11 @@ app.include_router(transfers_router)
 
 add_pagination(app)
 
+
 def main():
 
     print("Starting")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
-
-

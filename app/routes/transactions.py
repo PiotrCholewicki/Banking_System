@@ -11,8 +11,13 @@ from app.services import banking_service
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
 
+
 @router.post("/", response_model=TransactionRead)
-def create_transaction(payload: TransactionCreate, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+def create_transaction(
+    payload: TransactionCreate,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
 
     client = session.get(Client, current_user.client_id)
     if not client:
@@ -20,18 +25,10 @@ def create_transaction(payload: TransactionCreate, session: Session = Depends(ge
 
     ensure_client_access(client, current_user)
 
-
     transaction = banking_service.register_transaction(
         session,
         client_id=current_user.client_id,
         amount=payload.amount,
-        transaction_type=payload.transaction_type
+        transaction_type=payload.transaction_type,
     )
     return transaction
-
-
-
-
-
-
-

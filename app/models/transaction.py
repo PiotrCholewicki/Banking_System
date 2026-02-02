@@ -4,6 +4,7 @@ from decimal import Decimal
 from sqlalchemy import Numeric, Column
 from typing import Optional, TYPE_CHECKING
 
+
 class Transaction(SQLModel, table=True):
     __tablename__ = "transaction"
 
@@ -14,7 +15,6 @@ class Transaction(SQLModel, table=True):
     date: datetime = datetime.now()
     client: "Client" = Relationship(back_populates="transactions")
 
-
     def __str__(self) -> str:
         return (
             f"Transaction(id={self.id}, client_id={self.client_id}, "
@@ -23,7 +23,3 @@ class Transaction(SQLModel, table=True):
 
     def __repr__(self) -> str:
         return self.__str__()
-
-
-
-

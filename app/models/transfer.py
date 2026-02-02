@@ -15,7 +15,6 @@ class Transfer(SQLModel, table=True):
     date: datetime = datetime.now()
     # client: "Client" = Relationship(back_populates="transactions")
 
-
     def __str__(self) -> str:
         return (
             f"Transfer(id={self.id}, sender_id={self.sender_id}, "
@@ -24,7 +23,3 @@ class Transfer(SQLModel, table=True):
 
     def __repr__(self) -> str:
         return self.__str__()
-
-
-
-

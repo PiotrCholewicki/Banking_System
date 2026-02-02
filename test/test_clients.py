@@ -17,15 +17,11 @@ def test_get_my_client(auth_client, create_user):
     assert data["balance"] == "250.00"
 
 
-
 def test_get_my_transactions_correct(auth_client, create_user, session):
     user = create_user(username="Piotr", client_balance=300)
     c = auth_client(user)
 
-    tx = c.post("/transactions/", json={
-        "transaction_type": "deposit",
-        "amount": 200
-    })
+    tx = c.post("/transactions/", json={"transaction_type": "deposit", "amount": 200})
     assert tx.status_code == 200
 
     response = c.get("/clients/me/transactions")
@@ -38,9 +34,6 @@ def test_get_my_transactions_correct(auth_client, create_user, session):
     assert transaction["amount"] == "200.00"
 
 
-
-
-
 def test_my_transactions_multiple(auth_client, create_user):
     user = create_user(client_balance=1000)
     c = auth_client(user)
@@ -50,7 +43,6 @@ def test_my_transactions_multiple(auth_client, create_user):
 
     r = c.get("/clients/me/transactions")
     data = r.json()["items"]
-
 
     assert data[0]["transaction_type"] == "deposit"
     assert data[1]["transaction_type"] == "withdrawal"
@@ -83,7 +75,6 @@ def test_get_my_client_not_found(auth_client, create_user, session):
 def test_my_transactions_unauthorized(client):
     resp = client.get("/clients/me/transactions")
     assert resp.status_code == 401
-
 
 
 def test_my_transactions_client_missing(auth_client, create_user, session):
@@ -119,9 +110,12 @@ def test_delete_client_deletes_transactions(session, create_user):
     session.commit()
 
     # transaction in db
-    assert session.exec(
-        select(Transaction).where(Transaction.client_id == user.client_id)
-    ).first() is not None
+    assert (
+        session.exec(
+            select(Transaction).where(Transaction.client_id == user.client_id)
+        ).first()
+        is not None
+    )
 
     delete_client(user.client_id, session)
 
@@ -129,36 +123,21 @@ def test_delete_client_deletes_transactions(session, create_user):
     assert session.get(Client, user.client_id) is None
 
     # transactions deleted
-    assert session.exec(
-        select(Transaction).where(Transaction.client_id == user.client_id)
-    ).first() is None
-
-
+    assert (
+        session.exec(
+            select(Transaction).where(Transaction.client_id == user.client_id)
+        ).first()
+        is None
+    )
 
 
 def test_register_creates_client_correctly(client, session):
-    payload = {
-        "username": "janek",
-        "password": "abcd1234",
-        "balance": 250
-    }
+    payload = {"username": "janek", "password": "abcd1234", "balance": 250}
 
     resp = client.post("/auth/register", json=payload)
     assert resp.status_code == 201
 
-
-    created_client = session.exec(
-        select(Client).where(Client.name == "janek")
-    ).first()
+    created_client = session.exec(select(Client).where(Client.name == "janek")).first()
 
     assert created_client is not None
     assert str(created_client.balance) == "250.00"
-
-
-
-
-
-
-
-
-

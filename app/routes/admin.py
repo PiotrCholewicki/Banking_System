@@ -14,7 +14,8 @@ from app.auth.auth import (
     authenticate_user,
     create_access_token,
     get_current_user,
-    ACCESS_TOKEN_EXPIRE_MINUTES, require_admin,
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    require_admin,
 )
 from app.routes.clients import delete_client
 from app.schemas.auth import UserRegister, Token
@@ -24,34 +25,55 @@ from app.schemas.user import UserRead
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
+
 @router.get("/clients/")
-def list_clients(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)) -> Page[ClientReadWithTransactions]:
+def list_clients(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+) -> Page[ClientReadWithTransactions]:
     require_admin(current_user)
     return paginate(session.exec(select(Client)).all())
 
+
 @router.get("/users/")
-def list_users(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)) -> Page[UserRead]:
+def list_users(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+) -> Page[UserRead]:
     require_admin(current_user)
     return paginate(session.exec(select(User)).all())
 
+
 @router.get("/transactions")
-def list_transactions(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)) -> Page[TransactionRead]:
+def list_transactions(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+) -> Page[TransactionRead]:
     # admin = session.get(Client, admin.client_id) - only for admin
     # ensure_client_access(client, current_user)
     require_admin(current_user)
     return paginate(session.exec(select(Transaction)).all())
 
-@router.get("/clients/{client_id}", response_model=ClientReadWithTransactions)
-def get_client_by_id(client_id: int, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
 
+@router.get("/clients/{client_id}", response_model=ClientReadWithTransactions)
+def get_client_by_id(
+    client_id: int,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
     client = session.get(Client, client_id)
     require_admin(current_user)
     if not client:
         raise HTTPException(status_code=404, detail="Client not found")
     return client
 
+
 @router.delete("/users/{username}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user_by_username(username: str, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+def delete_user_by_username(
+    username: str,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
 
     require_admin(current_user)
     user = session.exec(select(User).where(User.username == username)).first()

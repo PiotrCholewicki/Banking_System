@@ -22,6 +22,7 @@ def session_fixture():
     with Session(engine) as session:
         yield session
 
+
 @pytest.fixture(name="client")
 def client_fixture(session: Session):
     def get_session_override():
@@ -36,12 +37,18 @@ def client_fixture(session: Session):
 
 @pytest.fixture
 def create_user(session):
-    def _create(username="test", password="1234", role="client", is_active=True, client_balance=100):
+    def _create(
+        username="test",
+        password="1234",
+        role="client",
+        is_active=True,
+        client_balance=100,
+    ):
         user = User(
             username=username,
             hashed_password=get_password_hash(password),
             role=role,
-            is_active=is_active
+            is_active=is_active,
         )
         session.add(user)
         session.commit()
@@ -55,6 +62,7 @@ def create_user(session):
         user.client_id = client.id
         session.commit()
         return user
+
     return _create
 
 
@@ -64,8 +72,9 @@ def make_token():
         return create_access_token(
             data={"sub": user.username},
             role=user.role,
-            expires_delta=timedelta(minutes=30)
+            expires_delta=timedelta(minutes=30),
         )
+
     return _token
 
 
@@ -75,5 +84,5 @@ def auth_client(client: TestClient, make_token):
         token = make_token(user)
         client.headers = {"Authorization": f"Bearer {token}"}
         return client
-    return _auth_client
 
+    return _auth_client

@@ -7,7 +7,7 @@ from decimal import Decimal
 from app.models.transaction import Transaction
 
 
-#validating simple fields
+# validating simple fields
 def validate_amount(amount):
     if not isinstance(amount, Decimal):
         return False
@@ -20,7 +20,7 @@ def validate_client_name(client_name):
     if not isinstance(client_name, str):
         return False
 
-    NAME_REGEX = r'^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+(?: [A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)?$'
+    NAME_REGEX = r"^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+(?: [A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)?$"
     if not re.match(NAME_REGEX, client_name):
         return False
     return True
@@ -37,7 +37,6 @@ def validate_transaction_type(transaction_type):
     return True
 
 
-
 def validate_client_id(client_id):
     if isinstance(client_id, bool):
         return False
@@ -49,8 +48,10 @@ def validate_client_id(client_id):
         return False
     return True
 
+
 def validate_client_balance(balance):
     return is_positive_int_or_float(balance)
+
 
 def validate_transactions(transactions):
     if not isinstance(transactions, list):
@@ -61,6 +62,7 @@ def validate_transactions(transactions):
             return False
 
     return True
+
 
 def is_positive_int_or_float(param):
     if isinstance(param, bool):

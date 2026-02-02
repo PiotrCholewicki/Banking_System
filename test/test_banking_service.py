@@ -16,7 +16,7 @@ def test_register_transaction_deposit(session: Session):
         session=session,
         client_id=client.id,
         amount=Decimal("50.00"),
-        transaction_type="deposit"
+        transaction_type="deposit",
     )
 
     assert tx.client_id == client.id
@@ -34,7 +34,7 @@ def test_register_transaction_withdrawal(session: Session):
         session=session,
         client_id=client.id,
         amount=Decimal("80.00"),
-        transaction_type="withdrawal"
+        transaction_type="withdrawal",
     )
 
     assert tx.transaction_type == "withdrawal"
@@ -51,7 +51,7 @@ def test_register_transaction_insufficient_funds(session: Session):
             session=session,
             client_id=client.id,
             amount=Decimal("100.00"),
-            transaction_type="withdrawal"
+            transaction_type="withdrawal",
         )
 
     assert e.value.status_code == 400
@@ -68,7 +68,7 @@ def test_register_transaction_invalid_amount(session: Session):
             session=session,
             client_id=client.id,
             amount=Decimal("-5"),
-            transaction_type="deposit"
+            transaction_type="deposit",
         )
 
 
@@ -82,7 +82,7 @@ def test_register_transaction_invalid_type(session: Session):
             session=session,
             client_id=client.id,
             amount=Decimal("10"),
-            transaction_type="NOT_A_TYPE"
+            transaction_type="NOT_A_TYPE",
         )
 
 
@@ -92,10 +92,11 @@ def test_register_transaction_client_not_found(session: Session):
             session=session,
             client_id=999,
             amount=Decimal("10"),
-            transaction_type="deposit"
+            transaction_type="deposit",
         )
 
     assert e.value.status_code == 404
+
 
 import pytest
 from decimal import Decimal
@@ -118,7 +119,7 @@ def test_register_transfer_success(session):
         session=session,
         sender_id=sender.id,
         receiver_id=receiver.id,
-        amount=Decimal("100.00")
+        amount=Decimal("100.00"),
     )
 
     updated_sender = session.get(Client, sender.id)
@@ -145,7 +146,7 @@ def test_register_transfer_same_sender_receiver(session):
             session=session,
             sender_id=client.id,
             receiver_id=client.id,
-            amount=Decimal("50")
+            amount=Decimal("50"),
         )
 
     assert e.value.status_code == 400
@@ -159,10 +160,7 @@ def test_register_transfer_client_not_found(session):
 
     with pytest.raises(HTTPException) as e:
         register_transfer(
-            session=session,
-            sender_id=sender.id,
-            receiver_id=999,
-            amount=Decimal("10")
+            session=session, sender_id=sender.id, receiver_id=999, amount=Decimal("10")
         )
 
     assert e.value.status_code == 404
@@ -180,7 +178,7 @@ def test_register_transfer_invalid_amount(session):
             session=session,
             sender_id=sender.id,
             receiver_id=receiver.id,
-            amount=Decimal("-1")
+            amount=Decimal("-1"),
         )
 
 
@@ -196,5 +194,5 @@ def test_register_transfer_insufficient_funds(session):
             session=session,
             sender_id=sender.id,
             receiver_id=receiver.id,
-            amount=Decimal("200")
+            amount=Decimal("200"),
         )

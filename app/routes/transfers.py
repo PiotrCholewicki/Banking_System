@@ -11,8 +11,13 @@ from app.services import banking_service
 
 router = APIRouter(prefix="/transfers", tags=["transfers"])
 
+
 @router.post("/", response_model=TransferRead)
-def create_transfer(payload: TransferCreate, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+def create_transfer(
+    payload: TransferCreate,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
     sender = session.get(Client, current_user.client_id)
     receiver = session.get(Client, payload.receiver_id)
     if not (sender and receiver):

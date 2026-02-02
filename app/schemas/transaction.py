@@ -9,13 +9,13 @@ class TransactionCreate(SQLModel):
     # client_id: int
 
 
-
 class TransactionRead(SQLModel):
     id: int
     transaction_type: str
     amount: Decimal
     client_id: int
     date: datetime
+
 
 class TransactionReadNoId(SQLModel):
     # id: int
