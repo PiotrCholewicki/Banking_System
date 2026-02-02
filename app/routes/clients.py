@@ -2,6 +2,8 @@ from decimal import Decimal
 from http.client import responses
 from typing import List
 
+from fastapi_pagination import Page, paginate
+
 import app.services.banking_service as banking_service
 from fastapi.params import Depends
 from sqlalchemy import Column, Numeric
@@ -13,7 +15,7 @@ from app.database import get_session
 from app.models.user import User
 from app.schemas.client import ClientCreate, ClientRead, ClientUpdate, ClientReadWithTransactions
 from app.models.client import Client
-from app.schemas.transaction import TransactionRead
+from app.schemas.transaction import TransactionRead, TransactionReadNoId
 from app.validators.value_validators import validate_client_name, validate_amount, validate_client_id, \
     validate_transaction_type
 
@@ -44,15 +46,15 @@ def get_my_info(session: Session = Depends(get_session), current_user: User = De
 
 
 
-@router.get("/me/transactions", response_model=List[TransactionRead])
-def get_my_transactions(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+@router.get("/me/transactions")
+def get_my_transactions(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)) -> Page[TransactionReadNoId]:
 
     client = session.get(Client, current_user.client_id)
     if not client:
         raise HTTPException(status_code=404, detail="Client not found")
 
 
-    return client.transactions
+    return paginate(client.transactions)
 
 
 # @router.get("/", response_model=list[ClientReadWithTransactions])

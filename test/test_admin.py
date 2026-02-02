@@ -7,7 +7,7 @@ def test_admin_list_clients_correct(auth_client, create_user):
 
     assert response.status_code == 200
 
-    data = response.json()
+    data = response.json()["items"]
     assert data[1]["balance"]=="400.00"
 
 def test_admin_list_clients_incorrect_role(auth_client, create_user):
@@ -25,7 +25,7 @@ def test_admin_list_users_correct(create_user, auth_client):
     create_user(username="adam", password="adam", role="client")
     response = c.get("/admin/users")
     assert response.status_code == 200
-    data = response.json()
+    data = response.json()["items"]
     assert data[1]["username"] == "adam"
 
 def test_admin_list_users_incorrect_role(create_user, auth_client):
@@ -51,7 +51,7 @@ def test_admin_list_transactions_correct(create_user, auth_client):
     response = c.get("/admin/transactions")
     assert response.status_code == 200
 
-    data = response.json()
+    data = response.json()["items"]
     assert data[0]["amount"] == "200.00"
 
 

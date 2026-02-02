@@ -1,6 +1,8 @@
 from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi_pagination import Page, paginate
+
 from sqlmodel import Session, select
 
 from app.database import get_session
@@ -18,25 +20,26 @@ from app.routes.clients import delete_client
 from app.schemas.auth import UserRegister, Token
 from app.schemas.client import ClientReadWithTransactions
 from app.schemas.transaction import TransactionRead
+from app.schemas.user import UserRead
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
-@router.get("/clients/", response_model=list[ClientReadWithTransactions])
-def list_clients(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+@router.get("/clients/")
+def list_clients(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)) -> Page[ClientReadWithTransactions]:
     require_admin(current_user)
-    return session.exec(select(Client)).all()
+    return paginate(session.exec(select(Client)).all())
 
 @router.get("/users/")
-def list_users(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+def list_users(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)) -> Page[UserRead]:
     require_admin(current_user)
-    return session.exec(select(User)).all()
+    return paginate(session.exec(select(User)).all())
 
-@router.get("/transactions", response_model=list[TransactionRead])
-def list_transactions(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+@router.get("/transactions")
+def list_transactions(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)) -> Page[TransactionRead]:
     # admin = session.get(Client, admin.client_id) - only for admin
     # ensure_client_access(client, current_user)
     require_admin(current_user)
-    return session.exec(select(Transaction)).all()
+    return paginate(session.exec(select(Transaction)).all())
 
 @router.get("/clients/{client_id}", response_model=ClientReadWithTransactions)
 def get_client_by_id(client_id: int, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):

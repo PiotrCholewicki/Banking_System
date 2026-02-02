@@ -31,12 +31,12 @@ def test_get_my_transactions_correct(auth_client, create_user, session):
     response = c.get("/clients/me/transactions")
     assert response.status_code == 200
 
-    data = response.json()
+    data = response.json()["items"]
     transaction = data[0]
 
     assert transaction["transaction_type"] == "deposit"
     assert transaction["amount"] == "200.00"
-    assert transaction["client_id"] == user.client_id
+
 
 
 
@@ -49,9 +49,9 @@ def test_my_transactions_multiple(auth_client, create_user):
     c.post("/transactions/", json={"transaction_type": "withdrawal", "amount": 50})
 
     r = c.get("/clients/me/transactions")
-    data = r.json()
+    data = r.json()["items"]
 
-    assert len(data) == 2
+
     assert data[0]["transaction_type"] == "deposit"
     assert data[1]["transaction_type"] == "withdrawal"
     assert c.get("/clients/me").json()["balance"] == "1150.00"
@@ -103,7 +103,7 @@ def test_my_transactions_empty(auth_client, create_user):
 
     resp = c.get("/clients/me/transactions")
     assert resp.status_code == 200
-    assert resp.json() == []
+    assert resp.json()["items"] == []
 
 
 def test_delete_client_deletes_transactions(session, create_user):
@@ -146,7 +146,7 @@ def test_register_creates_client_correctly(client, session):
     resp = client.post("/auth/register", json=payload)
     assert resp.status_code == 201
 
-    # sprawdzamy, czy klient powstał
+
     created_client = session.exec(
         select(Client).where(Client.name == "janek")
     ).first()

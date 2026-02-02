@@ -19,7 +19,7 @@ from app.routes.admin import router as admin_router
 # @app.on_event("startup")
 # def on_startup():
 #     SQLModel.metadata.create_all(engine)
-
+from fastapi_pagination import add_pagination
 
 load_dotenv()
 
@@ -62,7 +62,7 @@ app.include_router(transactions_router)
 
 app.include_router(transfers_router)
 
-
+add_pagination(app)
 
 def main():
 
